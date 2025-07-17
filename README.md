@@ -64,9 +64,9 @@ This demo lets you interact with small language models like **LaMini-Flan-T5** d
 
 ## 🔗 Links
 
-- 🌐 [Live Demo](https://yourusername.github.io/your-repo-name/ )
-- 📄 [README](https://github.com/yourusername/your-repo-name/blob/main/README.md )
-- 📂 [GitHub Repo](https://github.com/yourusername/your-repo-name )
+- 🌐 [Live Demo](https://g0stbit.github.io/CI7T5/demo)
+- 📄 [Document](https://g0stbit.github.io/CI7T5/)
+- 📂 [GitHub Repo](https://github.com/g0stbit/CI7T5)
 - 🤖 [LaMini-LM](https://github.com/mbzuai-nlp/lamini-lm )
 
 ---

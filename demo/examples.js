@@ -10,7 +10,7 @@ const examples = {
   },
   translate: {
     instruction: "Translate to Spanish:",
-    request: "Hello, how are you today?"
+    request: "Hello, how are you?"
   },
   paraphrase: {
     instruction: "Paraphrase:",

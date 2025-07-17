@@ -34,8 +34,14 @@ self.onmessage = async function(event) {
         if (!loadedModels[model]) {
           throw new Error("Model not loaded");
         }
+        console.log(data);
         const result = await loadedModels[model](data, {
-         // max_length: 80, // Maximum length of the generated text
+          /*"early_stopping": true,
+          "length_penalty": 2.0,
+          "max_length": 200,
+          "min_length": 30,
+          "no_repeat_ngram_size": 3,
+          "num_beams": 4,
           "early_stopping": true,
           "length_penalty": 2.0,
           "max_length": 200,
