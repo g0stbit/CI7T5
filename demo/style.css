@@ -1,0 +1,47 @@
+
+html {
+  padding:1em 2em;
+}
+body {
+  max-width: 700px;
+  margin: 0 auto;
+  font-family: pretendard, sans-serif;
+  padding: 20px;
+  line-height: 1.45;
+}
+p {
+  text-align:justify;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+input[type="text"],
+textarea,
+select {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 10px;
+  display:block;
+  box-sizing: border-box;
+}
+textarea {
+  height: 8em;
+}
+
+button {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+#answer {
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 50px;
+  white-space: pre-wrap;
+  background-color: #f9f9f9;
+  margin-top: 10px;
+}

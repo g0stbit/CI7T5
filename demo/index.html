@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transformer.js Multi Model Inference</title>
+  <script src="examples.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js "></script>
+  <script src="CI7T5.js" type="module"></script>
+  <link rel="stylesheet" as="style" href="style.css" />
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+</head>
+<body>
+  <header style="margin-bottom: 30px;">
+    <h1>LaMini-Flan-T5 Inference Demo</h1>
+    <p>
+      <strong>A lightweight, fast text-to-text model running entirely in your browser.</strong>
+    </p>
+    <p style="font-style:italic;color:#888;font-weight:300;font-size:0.95em">
+      This demo lets you interact with small language models like LaMini-Flan-T5 directly in your browser — no server or internet connection required after loading.
+      These models are optimized for quick inference on everyday tasks like summarizing, translating, and rewriting text.
+    </p>
+    <p style="font-size:0.9em">
+      ✅ Runs fully client-side<br>
+      ✅ No backend or API needed<br>
+      ⚠️ Works offline after initial load (planned feature)<br>
+      ✅ Supports multiple compact T5 variants
+    </p>
+  </header>
+  <div class="links">
+    <a href="https://g0stbit.github.io/CI7T5/demo" target="_blank">Live Demo</a> |
+    <a href="https://github.com/g0stbit/CI7T5" target="_blank">GitHub Repo</a> |
+    <a href="https://g0stbit.github.io/CI7T5" target="_blank">Document</a>
+  </div>
+
+  <h3>
+    <a href="#" onclick="document.getElementById('how-to-use').style.display = document.getElementById('how-to-use').style.display === 'none' ? 'block' : 'none'; return false;">
+      How to Use This Tool?</a>
+  </h3>
+
+  <section id="how-to-use" style="margin-top: 20px; display:none;background-color: #f0f0f0; padding: 20px; border-radius: 8px;">
+    <ol style="padding-left: 20px;">
+      <li><strong>Load a Model:</strong> Choose a model from the dropdown and click “Load Model”. This may take a few seconds.</li>
+      <li><strong>Enter Your Request:</strong> You can either:
+        <ul style="margin-top: 5px; padding-left: 20px;">
+          <li>Select an example from the dropdown, or</li>
+          <li>Type your own instruction (e.g., “summarize:”, “translate to Spanish:”) and provide content below it.</li>
+        </ul>
+      </li>
+      <li><strong>Generate Output:</strong> Click the “Generate” button and wait for the model to return a result.</li>
+    </ol>
+  </section>
+
+  <hr style="margin:3em 0;"/>
+
+  <section id="model-controls">
+    <h2>Model Selection</h2>
+    <div>
+      <label for="modelSelect">Choose a model:</label>
+      <select id="modelSelect">
+        <option value="LaMini-Flan-T5-77M">LaMini-Flan-T5-77M (~77M params)</option>
+        <option value="LaMini-Flan-T5-248M">LaMini-Flan-T5-248M (~248M params)</option>
+        <option value="custom">Custom (enter below)</option>
+      </select>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <input type="text" id="customModelInput" placeholder="Model name or HuggingFace repo URL" />
+    </div>
+
+    <div>
+      <button id="loadBtn">Load Model</button>
+      <button id="unloadBtn">Unload Model</button>
+    </div>
+
+    <p><strong>Status:</strong> <span id="status">Idle</span></p>
+  </section>
+
+  <!-- Example Selector -->
+
+  <!-- Input Fields -->
+  <section id="input-output" style="margin-top: 30px;">
+    <h2>Generate Output</h2>
+    <div>
+      <label for="exampleSelector">Choose an Example:</label>
+      <select id="exampleSelector">
+        <option value="">-- Select an example --</option>
+      </select>
+    </div>
+    <div>
+      <label for="instruction">Instruction</label>
+      <input type="text" id="instruction" placeholder="Enter instruction like 'summarize:' or 'translate to French'" disabled />
+    </div>
+    <div>
+      <label for="request">Your Content:</label>
+      <textarea id="request" placeholder="Enter your text here..." disabled></textarea>
+    </div>
+    <div>
+      <button id="generateBtn" disabled>Generate</button>
+    </div>
+    <div>
+      <label for="answer">Answer:</label>
+      <div id="answer"></div>
+    </div>
+  </section>
+
+  <!-- Worker Script -->
+  <script type="module">
+  </script>
+
+  <!-- DOM UX Logic -->
+  <script>
+    $(document).ready(function () {
+      const setInputsEnabled = (enabled) => {
+        $("#instruction, #request, #generateBtn").prop("disabled", !enabled);
+      };
+
+      const setModelControlsEnabled = (enabled) => {
+        $("#modelSelect, #loadBtn, #unloadBtn").prop("disabled", !enabled);
+      };
+
+      const updateStatus = (msg) => {
+        $("#status").text(msg);
+      };
+
+      const refreshButtonStates = () => {
+        const model = CI7T5._getModelName();
+        const isLoaded = CI7T5.isLoaded(model);
+
+        $("#loadBtn").prop("disabled", isLoaded);
+        $("#unloadBtn").prop("disabled", !isLoaded);
+      };
+
+      // --- Event Handlers ---
+      $("#modelSelect").on("change", function () {
+        const modelName = CI7T5._getModelName();
+        const isLoaded = CI7T5.isLoaded(modelName);
+
+        refreshButtonStates();
+
+        // Enable input fields if this model was already loaded
+        setInputsEnabled(isLoaded);
+
+        if (!isLoaded) {
+          $("#answer").text("");
+          $("#status").text("Model not loaded");
+        }
+      });
+
+      $("#loadBtn").on("click", function () {
+        setModelControlsEnabled(false);
+        updateStatus("Loading model...");
+        CI7T5.load(null, function (res) {
+          setInputsEnabled(true);
+          setModelControlsEnabled(true);
+          refreshButtonStates();
+        });
+      });
+
+      $("#unloadBtn").on("click", function () {
+        CI7T5.unload(null, function () {
+          setInputsEnabled(false);
+          refreshButtonStates();
+        });
+      });
+
+      $("#generateBtn").on("click", function () {
+        const instruction = $("#instruction").val().trim().replace(':', '');
+        const requestText = $("#request").val().trim();
+        const fullPrompt = `${instruction}: ${requestText}`.trim();
+
+        if (!fullPrompt) {
+          alert("Please provide both instruction and content!");
+          return;
+        }
+
+        updateStatus("Generating...");
+        CI7T5.request(null, fullPrompt, function (res) {
+          $("#answer").text(res.data || "No output");
+          updateStatus("Ready");
+        });
+      });
+
+      // Initial setup
+      setInputsEnabled(false);
+      $("#unloadBtn").prop("disabled", true);
+
+      // Populate examples
+      Object.keys(examples).forEach(function (key) {
+        const example = examples[key];
+        const option = $("<option>")
+          .val(key)
+          .text(example.instruction.replace(":", ""));
+        $("#exampleSelector").append(option);
+      });
+
+      $("#exampleSelector").on("change", function () {
+        const key = $(this).val();
+        if (!key || !examples[key]) return;
+
+        const example = examples[key];
+        $("#instruction").val(example.instruction);
+        $("#request").val(example.request);
+      });
+
+      // Listen to model load/unload events
+      CI7T5.on("load", function (res) {
+        $("#answer").text(res.data || "Model loaded!");
+        updateStatus("Model loaded!");
+        refreshButtonStates();
+      });
+
+      CI7T5.on("unload", function (res) {
+        $("#answer").text(res.data || "Model unloaded.");
+        updateStatus("Model unloaded!");
+        refreshButtonStates();
+      });
+
+      CI7T5.on("isLoaded", function (res) {
+        $("#answer").text(`Is model loaded? ${res.data ? "Yes" : "No"}`);
+      });
+
+      CI7T5.on("error", function (err) {
+        alert("Error: " + (err.message || "Unknown error"));
+      });
+    });
+  </script>
+</body>
+</html>
