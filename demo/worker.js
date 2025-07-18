@@ -34,8 +34,9 @@ self.onmessage = async function(event) {
         if (!loadedModels[model]) {
           throw new Error("Model not loaded");
         }
-        console.log(data);
-        const result = await loadedModels[model](data);
+        const result = await loadedModels[model](data,{
+          ...options
+        });
         respond(request_id, method, result[0]?.generated_text || "No output", model);
         break;
 

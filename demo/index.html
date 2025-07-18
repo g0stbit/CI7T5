@@ -166,7 +166,7 @@
       $("#generateBtn").on("click", function () {
         const instruction = $("#instruction").val().trim().replace(':', '');
         const requestText = $("#request").val().trim();
-        const fullPrompt = `${instruction}: ${requestText}`.trim();
+        const fullPrompt = `${instruction}: \n${requestText}`.trim();
 
         if (!fullPrompt) {
           alert("Please provide both instruction and content!");
