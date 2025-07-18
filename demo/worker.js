@@ -16,7 +16,7 @@ self.onmessage = async function(event) {
           break;
         }
         postMessage({ request_id, method, data: "Loading...", model });
-        const pipe = await pipeline('text2text-generation', model, { dtype: 'auto' });
+        const pipe = await pipeline('text2text-generation', model);
         loadedModels[model] = pipe;
         respond(request_id, method, "Loaded successfully", model);
         break;
@@ -35,23 +35,7 @@ self.onmessage = async function(event) {
           throw new Error("Model not loaded");
         }
         console.log(data);
-        const result = await loadedModels[model](data, {
-          /*"early_stopping": true,
-          "length_penalty": 2.0,
-          "max_length": 200,
-          "min_length": 30,
-          "no_repeat_ngram_size": 3,
-          "num_beams": 4,
-          "early_stopping": true,
-          "length_penalty": 2.0,
-          "max_length": 200,
-          "min_length": 30,
-          "no_repeat_ngram_size": 3,
-          "num_beams": 4,
-          do_sample: true, // Whether to use sampling (for more creative outputs)
-          temperature: 0.7, // Controls the randomness of the output*/
-          ...options
-        });
+        const result = await loadedModels[model](data);
         respond(request_id, method, result[0]?.generated_text || "No output", model);
         break;
 
